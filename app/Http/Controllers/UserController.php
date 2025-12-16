@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateUserRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -29,7 +30,8 @@ class UserController extends Controller
             });
         }
 
-        $users = $queries->orderByDesc($order)
+        $users = $queries->withCount(['orders as orders_counts'])
+            ->orderByDesc($order)
             ->skip($skip)
             ->take($pageSize)
             ->get();
@@ -38,7 +40,7 @@ class UserController extends Controller
             'message' => 'success',
             'data' => [
                 'page' => $page,
-                'users' => $users
+                'users' => UserResource::collection($users)
                 ]
             ]);
     }
