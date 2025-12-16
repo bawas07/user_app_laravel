@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Resources\UserResource;
+use App\Mail\NewUser;
+use App\Mail\Welcome;
 use App\Models\User;
+use App\UserRole;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -21,7 +25,7 @@ class UserController extends Controller
             $order = $sort;
         }
 
-        $queries = User::query();
+        $queries = User::query()->where("active", true);
 
         if ($search) {
             $queries->where(function ($q) use ($search) {
@@ -54,9 +58,18 @@ class UserController extends Controller
 
         $user->save();
 
+
+        $admin = User::query()
+            ->where('role', UserRole::Admin->value)
+            ->where('active', true)
+            ->get('email');
+
+        Mail::to($user->email)->queue(new Welcome($user));
+        Mail::to($admin)->queue(new NewUser($user));
+
         return response()->json([
             'message' => 'success',
             'data' => $user
-            ]);
+        ]);
     }
 }

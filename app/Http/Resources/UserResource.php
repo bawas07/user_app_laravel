@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -21,15 +22,15 @@ class UserResource extends JsonResource
         $canEdit = false;
 
         switch ($user->role) {
-            case 'administrator':
+            case UserRole::Admin->value:
                 $canEdit = true;
                 break;
-            case 'manager':
+            case UserRole::Manager->value:
                 if($data->role === 'user') {
                     $canEdit = true;
                 }
                 break;
-            case 'user':
+            case UserRole::User->value:
                 if($data->id == $user->id) {
                     $canEdit = true;
                 }

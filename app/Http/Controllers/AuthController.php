@@ -21,6 +21,10 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid email or password'], 401);
         }
 
+        if ($user->active != true) {
+            return response()->json(['message' => 'Account blocked'], 403);
+        }
+
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
