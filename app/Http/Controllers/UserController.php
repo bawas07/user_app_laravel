@@ -65,7 +65,9 @@ class UserController extends Controller
             ->get('email');
 
         Mail::to($user->email)->queue(new Welcome($user));
-        Mail::to($admin)->queue(new NewUser($user));
+        if (count($admin) > 0) {
+            Mail::to($admin)->queue(new NewUser($user));
+        }
 
         return response()->json([
             'message' => 'success',
